@@ -8,6 +8,12 @@ function PlanetsProvider({ children }) {
   const [filterByName, setFilterByName] = useState({ filterByname: {
     name: '',
   } });
+  const [obj, setObj] = useState({
+    filterByNumericValues: [] });
+
+  const [column, setColumn] = useState('population');
+  const [operator, setOperator] = useState('maior que');
+  const [numeric, setNumeric] = useState(0);
 
   useEffect(() => {
     const getPlanet = async () => {
@@ -21,11 +27,24 @@ function PlanetsProvider({ children }) {
     setFilterByName({ name: value });
   };
 
+  const handleFilter = (filterObj) => {
+    setObj({
+      filterByNumericValues: [filterObj, ...obj.filterByNumericValues] });
+  };
+
   const context = {
     planets,
     setPlanets,
     filterByName,
     setFilter,
+    obj,
+    handleFilter,
+    column,
+    setColumn,
+    operator,
+    setOperator,
+    numeric,
+    setNumeric,
   };
   return (
     <StarWarsContext.Provider value={ context }>

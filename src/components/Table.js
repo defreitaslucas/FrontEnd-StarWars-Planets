@@ -1,20 +1,48 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
 
 function Table() {
-  const { planets: { results },
-    filterByName: { name } } = useContext(StarWarsContext);
-  if (!results) {
-    return <span>Carregando...</span>;
-  }
+  const {
+    planets: { results },
+    filterByName: { name },
+    obj,
+    operator,
+    numeric,
+    column,
+  } = useContext(StarWarsContext);
 
-  const filterResults = () => {
-    if (name) {
-      return results
-        .filter((arg) => arg.name.toLowerCase().includes(name.toLowerCase()));
-    }
-    return results;
-  };
+  const [planets, setPlanets] = useState([]);
+
+  useEffect(() => {
+    const filterResults = () => {
+      if (name) {
+        return setPlanets(results
+          .filter((arg) => arg.name.toLowerCase().includes(name.toLowerCase())));
+      }
+      if (obj.filterByNumericValues.length) {
+        if (operator === 'maior que') {
+          return setPlanets(planets
+            .filter((element) => Number(element[column]) > Number(numeric)));
+        }
+        if (operator === 'menor que') {
+          return setPlanets(planets
+            .filter((element) => Number(element[column]) < Number(numeric)));
+        }
+        if (operator === 'igual a') {
+          return setPlanets(planets
+            .filter((element) => (element[column]) === numeric));
+        }
+        return setPlanets(planets);
+      }
+      return setPlanets(results);
+    };
+    filterResults();
+  }, [obj, name]);
+
+  useEffect(() => {
+    setPlanets(results);
+  }, [results]);
+
   return (
     <table>
       <thead>
@@ -35,7 +63,7 @@ function Table() {
         </tr>
       </thead>
       <tbody>
-        { filterResults().map(({
+        { planets && planets.map(({
           name: nome,
           rotation_period: rotationPeriod,
           orbital_period: orbitalPeriod,
